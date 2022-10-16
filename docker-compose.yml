@@ -6,5 +6,5 @@ services:
     volumes:
       - .:/code
     env_file: .env
-
-
+    ports:
+      - "8181:8888"
