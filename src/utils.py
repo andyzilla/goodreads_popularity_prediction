@@ -28,7 +28,6 @@ def load_dataset(sample_frac=None) -> pd.DataFrame:
                 df = df.sample(frac=sample_frac)
             if 'pagesNumber' in df.columns:
                 df.rename(columns={'pagesNumber': 'PagesNumber'}, inplace=True)
-            df['filename'] = file_name
             dfs.append(df)
 
     df = pd.concat(dfs)
