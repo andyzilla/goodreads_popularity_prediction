@@ -1,4 +1,5 @@
 import glob
+from datetime import date
 
 import pandas as pd
 from tqdm import tqdm
@@ -32,3 +33,28 @@ def load_dataset(sample_frac=None) -> pd.DataFrame:
 
     df = pd.concat(dfs)
     return df
+
+
+def clean_dataset(dataset):
+    """
+    Cleans the dataset
+    TODO: enumerate all cleaning steps, check EDA for details on these changes
+    """
+
+    dataset['TotalReviews'] = dataset['RatingDistTotal'].str.replace("total:", "").astype(int)
+
+    dataset = dataset.dropna(subset= 'Description')
+    dataset = dataset.drop(dataset[dataset['PublishYear'] <= pd.Timestamp.min.year].index)
+    dataset = dataset.drop(dataset[dataset['PublishYear'] >= date.today().year].index)
+
+    dataset['Publisher'] = dataset['Publisher'].fillna("Unknown")
+    dataset['Language'] = dataset['Language'].fillna('eng')
+
+    language_mask = dataset['Language'].str.startswith('en-')
+    dataset.loc[language_mask, 'Language'] = 'eng'
+
+    dataset = dataset[dataset.Language == 'eng']
+
+    dataset = dataset.drop(columns=['PublishMonth', 'Language', 'PublishDay', 'ISBN', 'RatingDist1', 'RatingDist2', 'RatingDist3', 'RatingDist4', 'RatingDist5', 'Count of text reviews', 'RatingDistTotal', 'CountsOfReview', 'Id'])
+
+    return dataset
