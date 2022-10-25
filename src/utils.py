@@ -57,4 +57,15 @@ def clean_dataset(dataset):
 
     dataset = dataset.drop(columns=['PublishMonth', 'Language', 'PublishDay', 'ISBN', 'RatingDist1', 'RatingDist2', 'RatingDist3', 'RatingDist4', 'RatingDist5', 'Count of text reviews', 'RatingDistTotal', 'CountsOfReview', 'Id'])
 
+    dataset = dataset.groupby(by=['Name', 'Authors']).agg({
+        'PublishYear': 'min',
+        'Publisher': list,
+        'Rating': 'median',
+        'PagesNumber': 'median',
+        'TotalReviews': 'max',
+        'Description': lambda series: series[series.str.len() == series.str.len().max()]
+    })
+
+    dataset.reset_index(inplace=True)
+
     return dataset
