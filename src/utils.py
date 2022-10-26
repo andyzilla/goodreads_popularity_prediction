@@ -11,12 +11,12 @@ def load_dataset(sample_frac=None) -> pd.DataFrame:
     :param sample_frac: it must be [0..1] value
     :return: the complete goodreads dataset (except those files without description)
     """
-    block_list = ['../data/book1-100k.csv',
-                  '../data/book100k-200k.csv',
-                  '../data/book200k-300k.csv',
-                  '../data/book300k-400k.csv',
-                  '../data/book400k-500k.csv',
-                  '../data/book500k-600k.csv',
+    block_list = ['../data.py/book1-100k.csv',
+                  '../data.py/book100k-200k.csv',
+                  '../data.py/book200k-300k.csv',
+                  '../data.py/book300k-400k.csv',
+                  '../data.py/book400k-500k.csv',
+                  '../data.py/book500k-600k.csv',
                   ]
     file_names = glob.glob('../data/book*.csv')
 
