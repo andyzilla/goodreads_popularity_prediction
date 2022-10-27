@@ -38,12 +38,22 @@ def load_dataset(sample_frac=None) -> pd.DataFrame:
 def clean_dataset(dataset):
     """
     Cleans the dataset
-    TODO: enumerate all cleaning steps, check EDA for details on these changes
+    - Converts RatingDistTotal into int and renames it as TotalReviews
+    - Drops rows with NaN Description
+    - Drops rows with year below Timestamp.min and above current year
+    - Encodes NaN Publisher as "Unknown"
+    - Replaces NaN languages by "eng" and drops all books that are not in "eng"
+    - Drops unnecessary columns
+    - Removes duplicated books, keeping min PublishYear, list of Publisher, median Rating and PagesNumber,
+    max TotalReviews and longest description.
     """
+    dataset['Name'] = dataset.Name.str.lower()
+    dataset['Description'] = dataset.Description.str.lower()
+    dataset['Publisher'] = dataset.Publisher.str.lower()
 
     dataset['TotalReviews'] = dataset['RatingDistTotal'].str.replace("total:", "").astype(int)
 
-    dataset = dataset.dropna(subset= 'Description')
+    dataset = dataset.dropna(subset='Description')
     dataset = dataset.drop(dataset[dataset['PublishYear'] <= pd.Timestamp.min.year].index)
     dataset = dataset.drop(dataset[dataset['PublishYear'] >= date.today().year].index)
 
