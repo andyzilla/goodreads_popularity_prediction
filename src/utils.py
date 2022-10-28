@@ -38,6 +38,7 @@ def load_dataset(sample_frac=None) -> pd.DataFrame:
 def clean_dataset(dataset):
     """
     Cleans the dataset
+    - Converts str columns into lowercase
     - Converts RatingDistTotal into int and renames it as TotalReviews
     - Drops rows with NaN Description
     - Drops rows with year below Timestamp.min and above current year
@@ -47,35 +48,47 @@ def clean_dataset(dataset):
     - Removes duplicated books, keeping min PublishYear, list of Publisher, median Rating and PagesNumber,
     max TotalReviews and longest description.
     """
+    print("Lowering case of text fields")
     dataset['Name'] = dataset.Name.str.lower()
+    dataset['Authors'] = dataset.Name.str.lower()
     dataset['Description'] = dataset.Description.str.lower()
     dataset['Publisher'] = dataset.Publisher.str.lower()
 
+    print("Extracting TotalReviews")
     dataset['TotalReviews'] = dataset['RatingDistTotal'].str.replace("total:", "").astype(int)
 
-    dataset = dataset.dropna(subset='Description')
+    print("Dropping Null values")
+    dataset = dataset.dropna(subset=['Description'])
+
     dataset = dataset.drop(dataset[dataset['PublishYear'] <= pd.Timestamp.min.year].index)
     dataset = dataset.drop(dataset[dataset['PublishYear'] >= date.today().year].index)
 
+    print("Filling Null values")
     dataset['Publisher'] = dataset['Publisher'].fillna("Unknown")
-    dataset['Language'] = dataset['Language'].fillna('eng')
 
+    dataset['Language'] = dataset['Language'].fillna('eng')
     language_mask = dataset['Language'].str.startswith('en-')
     dataset.loc[language_mask, 'Language'] = 'eng'
-
     dataset = dataset[dataset.Language == 'eng']
 
-    dataset = dataset.drop(columns=['PublishMonth', 'Language', 'PublishDay', 'ISBN', 'RatingDist1', 'RatingDist2', 'RatingDist3', 'RatingDist4', 'RatingDist5', 'Count of text reviews', 'RatingDistTotal', 'CountsOfReview', 'Id'])
+    print("Dropping unused columns")
+    dataset = dataset.drop(columns=['PublishMonth', 'Language', 'PublishDay',
+                                    'ISBN', 'RatingDist1', 'RatingDist2',
+                                    'RatingDist3', 'RatingDist4', 'RatingDist5',
+                                    'Count of text reviews', 'RatingDistTotal',
+                                    'CountsOfReview', 'Id'])
 
+    print("Deduplicating")
     dataset = dataset.groupby(by=['Name', 'Authors']).agg({
         'PublishYear': 'min',
         'Publisher': list,
         'Rating': 'median',
         'PagesNumber': 'median',
         'TotalReviews': 'max',
-        'Description': lambda series: series[series.str.len() == series.str.len().max()]
+        'Description': lambda series: series[series.str.len() == series.str.len().max()].iloc[0]
     })
 
     dataset.reset_index(inplace=True)
+    dataset = dataset[dataset.Description != 'null']
 
     return dataset
