@@ -4,13 +4,11 @@ As a publisher, when marketing a new book, I want to determine the title and des
 
 ## 1) Installation instructions
 ### 1.1 Environment Setup
-- You can use docker to load all requirements, as detailed in requirements.txt (run "make build")
+- You can use `pip install -r requirements.txt` to load all requirements
 
 ### 1.2. Download Dataset from Kaggle
-- Make a copy of .env-template as ".env" and include your Kaggle credentials (username and key).
-- Run "make data"
- TODO: explain we're using files from 600k onwards (contain) description
-
+- Make a copy of `.env-template` as `.env` and include your Kaggle credentials (username and key).
+- Run `make data` to download Kaggle dataset
 
 ## 2) Usage instructions
 
